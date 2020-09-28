@@ -1,0 +1,84 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="box-element" id="form-wrapper">
+                <form id="form">
+                    <div id="user-info">
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="name" placeholder="Name..." required>
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="email" name="email" placeholder="Email..." required>
+                        </div>
+                    </div>
+                    <div id="shipping-info">
+                        <hr>
+                        <p>Shipping Information:</p>
+                        <hr>
+                        <div class="form-field">
+                            <input type="text" name="address" placeholder="Address...">
+                        </div>
+                        <div class="form-field">
+                            <input type="text" name="city" placeholder="City...">
+                        </div>
+                        <div class="form-field">
+                            <input type="text" name="state" placeholder="State...">
+                        </div>
+                        <div class="form-field">
+                            <input type="text" name="zipcode" placeholder="Zip Code...">
+                        </div>
+                        <div class="form-field">
+                            <input type="text" name="country" placeholder="Country...">
+                        </div>
+                    </div>
+                    <hr>
+                    <input id="form-buttom" class="btn btn-success btn-block" type="submit" value="Continue">
+                </form>
+                <br>
+
+                <div class="box-element hidden" id="payment-info">
+                    <small>Paypal Options</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="box-element" id="form-wrapper">
+                <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+                <hr>
+                <h3>Order Summary</h3>
+                <hr>
+                {% for item in items %}
+                <div class="cart-row">
+                    <div style="flex: 2;"><img class="row-image" src="{{ item.product.imageURL }}"></div>
+                    <div style="flex: 2;">{{ item.product.name }}</div>
+                    <div style="flex: 1;">${{ item.product.price }}</div>
+                    <div style="flex: 1;">x{{ item.quantity }}</div>
+                </div>
+                {% endfor %}
+                <h5>Items: {{ order.get_cart_items }}</h5>
+                <h5>Total: ${{ order.get_cart_total|floatformat:2 }}</h5>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        //Ocultar formulario de envio, si es el producto es digital
+        var shipping = '{{ order.shipping }}'
+
+        if(shipping == 'False'){
+            document.getElementById('shipping-info').innerHTML = ''
+        }
+
+        //Ocultar boton Continue y mostrar Payment
+        var form = document.getElementById('form')
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault()
+            console.log('Form submitted...')
+            document.getElementById('form-buttom').classList.add('hidden')
+            document.getElementById('payment-info').classList.remove('hidden')
+        })
+    </script>
+{% endblock content %}
