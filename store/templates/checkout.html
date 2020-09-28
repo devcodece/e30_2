@@ -40,11 +40,12 @@
 
                 <div class="box-element hidden" id="payment-info">
                     <small>Paypal Options</small>
+                    <button class="btn btn-outline-dark" id="make-payment">Make Payment</button>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="box-element" id="form-wrapper">
+            <div class="box-element">
                 <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
                 <hr>
                 <h3>Order Summary</h3>
@@ -66,9 +67,21 @@
     <script>
         //Ocultar formulario de envio, si es el producto es digital
         var shipping = '{{ order.shipping }}'
+        var total = '{{ order.get_cart_total|floatformat:2 }}'
 
         if(shipping == 'False'){
             document.getElementById('shipping-info').innerHTML = ''
+        }
+
+        if(user != 'AnonymousUser'){
+            document.getElementById('user-info').innerHTML = ''
+        }
+
+        if(shipping == 'False' && user != 'AnonymousUser'){
+            //Ocultar el formulario completo si el usuario esta logueado y shipping es Falso
+            document.getElementById('form').classList.add('hidden')
+            //Mostrar el pago si el usuario esta logueado y el producto no requiere shipping
+            document.getElementById('payment-info').classList.remove('hidden')
         }
 
         //Ocultar boton Continue y mostrar Payment
@@ -80,5 +93,62 @@
             document.getElementById('form-buttom').classList.add('hidden')
             document.getElementById('payment-info').classList.remove('hidden')
         })
+
+        //Manejo del boton make-payment
+        document.getElementById('make-payment').addEventListener('click', function(e){
+            submitFormData()
+        })
+
+        function submitFormData(){
+            console.log('Payment button clicked')
+        
+        //Declarando las variables que tendran la informacion
+            var userFormData = {
+                'name':null,
+                'email':null,
+                'total':total,
+            }
+
+            var shippingInfo = {
+                'address':null,
+                'city':null,
+                'state':null,
+                'zipcode':null,
+            }
+        
+        //Capturando la informacion introducida en el formulario
+
+            if(shipping != 'False'){
+                shippingInfo.address = form.address.value
+                shippingInfo.city = form.city.value
+                shippingInfo.state = form.state.value
+                shippingInfo.zipcode = form.zipcode.value
+            }
+
+            if(user == 'AnonymousUser'){
+                userFormData.name = form.name.value
+                userFormData.name = form.email.value
+            }
+
+            
+            var url = '/process_order/'
+
+            //Mandando la informacion a traves de POST y capturandola en un json
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({'form':userFormData, 'shipping':shippingInfo})
+            })
+
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data)
+                alert('Transaction completed')
+                window.location.href = "{% url 'store' %}"
+            })
+        }
     </script>
 {% endblock content %}
