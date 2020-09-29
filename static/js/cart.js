@@ -14,8 +14,8 @@ for(i=0; i < updateBtns.length; i++){
         console.log('User:', user)
 
         if(user === 'AnonymousUser'){
-            console.log('Not looged in')
-            //addCookieItem(productId, action)
+            //console.log('Not looged in')
+            addCookieItem(productId, action)
         }else{
             //console.log('User is logged sending data...')
             updateUserOrder(productId, action)
@@ -23,12 +23,15 @@ for(i=0; i < updateBtns.length; i++){
     })
 }
 
-/* function addCookieItem(productId, action){
-    console.log('Not logged in...')
+//MANEJO DEL USUARIO ANONIMO
+function addCookieItem(productId, action){
+    console.log('Not logget in...')
 
     if(action == 'add'){
         if(cart[productId] == undefined){
-            cart[productId] = {'quantity':1}
+            cart[productId] = {
+                'quantity':1
+            }
         }else{
             cart[productId]['quantity'] += 1
         }
@@ -37,15 +40,16 @@ for(i=0; i < updateBtns.length; i++){
     if(action == 'remove'){
         cart[productId]['quantity'] -= 1
 
-        if(cart[productId]['quantity'] <= 0){
-            console.log('Remove item')
+        if(cart[productId]['quantity'] <= 0 ){
+            console.log('Remove Item')
             delete cart[productId]
         }
     }
-    console.log('Cart:', cart)
+    console.log('Cart', cart)
     document.cookie = 'cart=' + JSON.stringify(cart) + "; domain = ; path = /"
     location.reload()
-} */
+}
+
 
 function updateUserOrder(productId, action){
     console.log('User is logged in, sending data...')
